@@ -3,4 +3,5 @@
 public record KubernetesService(
     string Namespace,
     string Name,
-    Map<string, int> TargetPorts);
+    Map<string, int> TargetPorts,
+    Map<string, string> Selector);

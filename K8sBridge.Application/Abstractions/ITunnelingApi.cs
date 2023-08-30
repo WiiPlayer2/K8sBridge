@@ -2,5 +2,5 @@
 
 public interface ITunnelingApi
 {
-    ValueTask CreateTunnelAsync(int localPort, int remotePort, CancellationToken cancellationToken = default);
+    ValueTask CreateTunnelAsync(int tunnelingPort, string tunnelingName, int localPort, int remotePort, CancellationToken cancellationToken = default);
 }

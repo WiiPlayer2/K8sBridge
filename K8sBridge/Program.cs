@@ -30,7 +30,7 @@ async Task ExecuteInRuntime(InvocationContext ctx)
     var runtime = Runtime.New(
         ctx.GetCancellationToken(),
         Eff<IKubernetesApi>(() => new KubernetesApi()),
-        default);
+        Eff<ITunnelingApi>(() => new TunnelingApi()));
     var runArgs = new RunArgs(
         ctx.ParseResult.GetValueForOption(namespaceOption) ?? throw new ArgumentNullException("namespace"),
         ctx.ParseResult.GetValueForArgument(serviceArgument) ?? throw new ArgumentNullException("service"),

@@ -16,17 +16,18 @@ public class Entrypoint<RT>
             args.Namespace,
             $"tunneling-{args.Service}",
             k8sService.TargetPorts,
-            bridgePort)
+            bridgePort,
+            k8sService.Selector)
         let tunnelingPort = random(1000) + 7000
         from _10 in Aff((RT rt) => k8sApi.CreateBridgePod(bridgePod, rt.CancellationToken).ToUnit())
         from cancelTunneling in Aff((RT rt) => k8sApi.PortforwardAsync(bridgePod.Namespace, bridgePod.Name, bridgePort, tunnelingPort, rt.CancellationToken).ToUnit())
             .Fork()
         from tunnelingApi in rt.TunnelingApiEff
         from cancelPorts in bridgePod.Ports
-            .Select(x => Aff((RT rt) => tunnelingApi.CreateTunnelAsync(args.PortMap[x.Key], x.Value).ToUnit()))
+            .Select(x => Aff((RT rt) => tunnelingApi.CreateTunnelAsync(tunnelingPort, x.Key, args.PortMap[x.Key], x.Value, rt.CancellationToken).ToUnit()))
             .TraverseParallel(identity)
             .Fork()
-        from _20 in Aff((RT rt) => Task.Delay(Timeout.Infinite).ToUnit().ToValue())
+        from _20 in Aff((RT rt) => Task.Delay(Timeout.Infinite, rt.CancellationToken).ToUnit().ToValue())
         // - Remove pod
         select unit;
 }

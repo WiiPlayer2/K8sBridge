@@ -20,7 +20,9 @@ internal class KubernetesApi : IKubernetesApi
     {
         var createdPod = await k8s.CoreV1.CreateNamespacedPodAsync(
             new V1Pod(
-                metadata: new V1ObjectMeta(name: pod.Name),
+                metadata: new V1ObjectMeta(
+                    name: pod.Name,
+                    labels: pod.Labels.ToDictionary(x => x.Key, x => x.Value)),
                 spec: new V1PodSpec(new List<V1Container>
                 {
                     new(
@@ -40,7 +42,10 @@ internal class KubernetesApi : IKubernetesApi
                 cancellationToken: cancellationToken)
             .WatchAsync<V1Pod, V1PodList>(cancellationToken: cancellationToken)
             .Where(x => x.Item2.Metadata.Name == createdPod.Name())
-            .FirstAsync(x => x.Item2.Status.Conditions.Any(x => x.Type == "Ready" && x.Status == "True"), cancellationToken);
+            .FirstAsync(x => (x.Item2.Status.Conditions
+                              ?? Enumerable.Empty<V1PodCondition>())
+                    .Any(x => x is {Type: "Ready", Status: "True"}),
+                cancellationToken);
     }
 
     public async ValueTask<Option<KubernetesService>> FindServiceAsync(string @namespace, string name, CancellationToken cancellationToken = default)
@@ -56,7 +61,8 @@ internal class KubernetesApi : IKubernetesApi
             k8sService.Name(),
             k8sService.Spec.Ports
                 .Select(x => (x.Name, int.Parse(x.TargetPort)))
-                .ToMap());
+                .ToMap(),
+            k8sService.Spec.Selector.ToMap());
     }
 
     public async ValueTask PortforwardAsync(string @namespace, string name, int port, int localPort, CancellationToken cancellationToken = default)
