@@ -3,6 +3,8 @@ using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using K8sBridge.Application;
+using K8sBridge.Application.Abstractions;
+using K8sBridge.Implementations;
 
 var namespaceOption = new System.CommandLine.Option<string>(new[] {"--namespace", "-n"});
 var serviceArgument = new Argument<string>("service");
@@ -27,7 +29,7 @@ async Task ExecuteInRuntime(InvocationContext ctx)
 {
     var runtime = Runtime.New(
         ctx.GetCancellationToken(),
-        default,
+        Eff<IKubernetesApi>(() => new KubernetesApi()),
         default);
     var runArgs = new RunArgs(
         ctx.ParseResult.GetValueForOption(namespaceOption) ?? throw new ArgumentNullException("namespace"),
