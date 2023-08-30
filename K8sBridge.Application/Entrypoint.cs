@@ -9,7 +9,6 @@ public class Entrypoint<RT>
         from _00 in unitEff
         from rt in runtime<RT>()
         from k8sApi in rt.KubernetesApiEff
-        from tunnelingApi in rt.TunnelingApiEff
         from k8sService in Aff((RT rt) => k8sApi.FindServiceAsync(args.Namespace, args.Service, rt.CancellationToken))
             .Bind(x => x.ToEff())
         let bridgePort = 7000
@@ -22,6 +21,7 @@ public class Entrypoint<RT>
         from _10 in Aff((RT rt) => k8sApi.CreateBridgePod(bridgePod, rt.CancellationToken).ToUnit())
         from cancelTunneling in Aff((RT rt) => k8sApi.PortforwardAsync(bridgePod.Namespace, bridgePod.Name, bridgePort, tunnelingPort, rt.CancellationToken).ToUnit())
             .Fork()
+        from tunnelingApi in rt.TunnelingApiEff
         from cancelPorts in bridgePod.Ports
             .Select(x => Aff((RT rt) => tunnelingApi.CreateTunnelAsync(args.PortMap[x.Key], x.Value).ToUnit()))
             .TraverseParallel(identity)

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "K8sBridge": {
+      "commandName": "Project",
+      "commandLineArgs": "ra-service-app-svc -n pki-lab -o app-port-https -p 50443"
+    }
+  }
+}

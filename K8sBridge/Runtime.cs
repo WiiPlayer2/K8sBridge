@@ -37,15 +37,15 @@ internal readonly struct Runtime :
 
     public static Runtime New(
         CancellationToken cancellationToken,
-        IKubernetesApi kubernetesApi,
-        ITunnelingApi tunnelingApi)
+        Eff<Runtime, IKubernetesApi> kubernetesApiEff,
+        Eff<Runtime, ITunnelingApi> tunnelingApiEff)
     {
         var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         return New(new Env_(
             cts.Token,
             cts,
-            SuccessEff(kubernetesApi),
-            SuccessEff(tunnelingApi)));
+            kubernetesApiEff,
+            tunnelingApiEff));
     }
 
     public record Env_(
