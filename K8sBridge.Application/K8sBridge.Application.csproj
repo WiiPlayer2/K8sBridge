@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\K8sBridge.Domain\K8sBridge.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
