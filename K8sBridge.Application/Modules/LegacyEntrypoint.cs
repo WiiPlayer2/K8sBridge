@@ -1,11 +1,11 @@
 ﻿using K8sBridge.Application.Traits;
 
-namespace K8sBridge.Application;
+namespace K8sBridge.Application.Modules;
 
-public class Entrypoint<RT>
+public class LegacyEntrypoint<RT>
     where RT : struct, HasCancel<RT>, HasApp<RT>
 {
-    public static Aff<RT, Unit> Run(RunArgs args) =>
+    public static Aff<RT, Unit> Run(LegacyRunArgs args) =>
         from _00 in unitEff
         from rt in runtime<RT>()
         from k8sApi in rt.KubernetesApiEff

@@ -2,7 +2,7 @@
   "profiles": {
     "K8sBridge": {
       "commandName": "Project",
-      "commandLineArgs": "whoami-webapp -n utility -o http -p 50080"
+      "commandLineArgs": "legacy whoami-webapp -n utility -o http -p 50080"
     }
   }
 }

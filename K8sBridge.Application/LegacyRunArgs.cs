@@ -1,6 +1,6 @@
 ﻿namespace K8sBridge.Application;
 
-public record RunArgs(
+public record LegacyRunArgs(
     string Namespace,
     string Service,
     Map<string, int> PortMap);

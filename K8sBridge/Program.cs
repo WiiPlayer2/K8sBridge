@@ -1,41 +1,46 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Builder;
-using System.CommandLine.Invocation;
+using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
 using K8sBridge.Application;
 using K8sBridge.Application.Abstractions;
+using K8sBridge.Application.Modules;
 using K8sBridge.Implementations;
 
-var namespaceOption = new System.CommandLine.Option<string>(new[] {"--namespace", "-n"});
-var serviceArgument = new Argument<string>("service");
-var portNamesOption = new System.CommandLine.Option<string[]>(new[] {"--port-name", "-o"});
-var portsOption = new System.CommandLine.Option<int[]>(new[] {"--port", "-p"});
+var legacyCommand = new Command("legacy")
+{
+    new System.CommandLine.Option<string>(new[] {"--namespace", "-n",}),
+    new Argument<string>("service"),
+    new System.CommandLine.Option<string[]>(new[] {"--port-name", "-o",}),
+    new System.CommandLine.Option<int[]>(new[] {"--port", "-p",}),
+};
+legacyCommand.Handler = CommandHandler.Create(InvokeLegacy);
 
 var rootCommand = new RootCommand
 {
-    namespaceOption,
-    serviceArgument,
-    portNamesOption,
-    portsOption,
+    legacyCommand,
 };
-rootCommand.SetHandler(ExecuteInRuntime);
 
 var parser = new CommandLineBuilder(rootCommand)
     .UseDefaults()
     .Build();
 return await parser.InvokeAsync(args);
 
-async Task ExecuteInRuntime(InvocationContext ctx)
-{
-    var runtime = Runtime.New(
-        ctx.GetCancellationToken(),
+async Task InvokeLegacy(
+    string @namespace,
+    string service,
+    string[] portName,
+    int[] port,
+    CancellationToken cancellationToken) =>
+    await LegacyEntrypoint<Runtime>
+        .Run(new LegacyRunArgs(
+            @namespace,
+            service,
+            portName.Zip(port).ToMap()))
+        .RunUnit(BuildRuntime(cancellationToken));
+
+Runtime BuildRuntime(CancellationToken cancellationToken) =>
+    Runtime.New(
+        cancellationToken,
         Eff<IKubernetesApi>(() => new KubernetesApi()),
         Eff<ITunnelingApi>(() => new TunnelingApi()));
-    var runArgs = new RunArgs(
-        ctx.ParseResult.GetValueForOption(namespaceOption) ?? throw new ArgumentNullException("namespace"),
-        ctx.ParseResult.GetValueForArgument(serviceArgument) ?? throw new ArgumentNullException("service"),
-        (ctx.ParseResult.GetValueForOption(portNamesOption) ?? throw new ArgumentNullException("portNames"))
-        .Zip(ctx.ParseResult.GetValueForOption(portsOption))
-        .ToMap());
-    await Entrypoint<Runtime>.Run(runArgs).RunUnit(runtime);
-}
