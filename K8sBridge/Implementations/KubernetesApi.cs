@@ -48,6 +48,11 @@ internal class KubernetesApi : IKubernetesApi
                 cancellationToken);
     }
 
+    public async ValueTask DeleteBridgePod(KubernetesBridgePod pod, CancellationToken cancellationToken = default)
+    {
+        await k8s.CoreV1.DeleteNamespacedPodAsync(pod.Name, pod.Namespace, cancellationToken: cancellationToken);
+    }
+
     public async ValueTask<Option<KubernetesService>> FindServiceAsync(string @namespace, string name, CancellationToken cancellationToken = default)
     {
         var k8sService = await k8s.CoreV1.ReadNamespacedServiceAsync(name, @namespace, cancellationToken: cancellationToken);

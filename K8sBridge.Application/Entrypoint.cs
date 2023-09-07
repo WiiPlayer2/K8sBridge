@@ -27,7 +27,10 @@ public class Entrypoint<RT>
             .Select(x => Aff((RT rt) => tunnelingApi.CreateTunnelAsync(tunnelingPort, x.Key, args.PortMap[x.Key], x.Value, rt.CancellationToken).ToUnit()))
             .TraverseParallel(identity)
             .Fork()
-        from _20 in Aff((RT rt) => Task.Delay(Timeout.Infinite, rt.CancellationToken).ToUnit().ToValue())
-        // - Remove pod
+        from _20 in WaitForTermination()
+            .Catch(Aff(() => k8sApi.DeleteBridgePod(bridgePod).ToUnit()))
         select unit;
+
+    private static Aff<RT, Unit> WaitForTermination() =>
+        Aff((RT rt) => Task.Delay(Timeout.Infinite, rt.CancellationToken).ToUnit().ToValue());
 }
