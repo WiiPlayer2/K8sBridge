@@ -8,5 +8,5 @@ pipeline
 {
     agent { label 'docker' }
 
-    stages { stage('All') { steps { container('docker') { script { runAll(); } } } } }
+    stages { stage('All') { steps { script { runAll(); } } } }
 }
