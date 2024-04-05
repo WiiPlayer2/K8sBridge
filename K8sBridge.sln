@@ -3,17 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K8sBridge", "K8sBridge\K8sBridge.csproj", "{52897109-19BD-40C3-9A9D-0E1288F37E2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K8sBridge", "K8sBridge\K8sBridge.csproj", "{52897109-19BD-40C3-9A9D-0E1288F37E2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K8sBridge.Application", "K8sBridge.Application\K8sBridge.Application.csproj", "{732FC9B9-9EDF-476F-94C5-35E7B41CDB65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K8sBridge.Application", "K8sBridge.Application\K8sBridge.Application.csproj", "{732FC9B9-9EDF-476F-94C5-35E7B41CDB65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K8sBridge.Domain", "K8sBridge.Domain\K8sBridge.Domain.csproj", "{E47F9958-A774-4788-816E-AD06F23C12A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K8sBridge.Domain", "K8sBridge.Domain\K8sBridge.Domain.csproj", "{E47F9958-A774-4788-816E-AD06F23C12A2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{7A5D563A-BC51-475A-999C-4D1489642D41}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
 		GlobalUsings.cs = GlobalUsings.cs
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K8sBridge.Test", "K8sBridge.Test\K8sBridge.Test.csproj", "{D7D196ED-18E7-497D-BF71-84F130185BE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{E47F9958-A774-4788-816E-AD06F23C12A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E47F9958-A774-4788-816E-AD06F23C12A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E47F9958-A774-4788-816E-AD06F23C12A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7D196ED-18E7-497D-BF71-84F130185BE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7D196ED-18E7-497D-BF71-84F130185BE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7D196ED-18E7-497D-BF71-84F130185BE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7D196ED-18E7-497D-BF71-84F130185BE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

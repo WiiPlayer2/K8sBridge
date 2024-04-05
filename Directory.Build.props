@@ -1,4 +1,12 @@
 <Project>
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<VersionPrefix>0.1</VersionPrefix>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+	
 	<ItemGroup>
 		<PackageReference Include="LanguageExt.Core" Version="4.4.3" />
 		<PackageReference Include="LanguageExt.Transformers" Version="4.4.3" />
