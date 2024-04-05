@@ -1,0 +1,4 @@
+- Nuget:
+    Project: ./K8sBridge/K8sBridge.csproj
+    VersionSuffix: $TIMESTAMP
+    SourceCredentials: private-nuget-repo
