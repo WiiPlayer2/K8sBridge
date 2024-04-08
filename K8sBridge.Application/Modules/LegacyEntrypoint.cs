@@ -1,4 +1,5 @@
 ﻿using K8sBridge.Application.Traits;
+using LanguageExt.UnitsOfMeasure;
 
 namespace K8sBridge.Application.Modules;
 
@@ -22,6 +23,7 @@ public class LegacyEntrypoint<RT>
         from _10 in Aff((RT rt) => k8sApi.CreateBridgePod(bridgePod, rt.CancellationToken).ToUnit())
         from cancelTunneling in Aff((RT rt) => k8sApi.PortforwardAsync(bridgePod.Namespace, bridgePod.Name, bridgePort, tunnelingPort, rt.CancellationToken).ToUnit())
             .Fork()
+        from _15 in Aff((RT rt) => Task.Delay(5.Seconds(), rt.CancellationToken).ToUnit().ToValue())
         from tunnelingApi in rt.TunnelingApiEff
         from cancelPorts in bridgePod.Ports
             .Select(x => Aff((RT rt) => tunnelingApi.CreateTunnelAsync(tunnelingPort, x.Key, args.PortMap[x.Key], x.Value, rt.CancellationToken).ToUnit()))
