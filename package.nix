@@ -19,10 +19,6 @@ buildDotnetModule rec {
   dotnetInstallFlags = "-f net8.0";
 
   makeWrapperArgs = [
-    # "--prefix"
-    # "LD_LIBRARY_PATH"
-    # ":"
-    # "${dotnet-sdk.icu}/lib"
     "--suffix"
     "PATH"
     ":"
