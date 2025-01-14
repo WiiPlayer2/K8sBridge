@@ -12,6 +12,8 @@ buildDotnetModule rec {
   };
 
   projectFile = "K8sBridge/K8sBridge.csproj";
+  nugetDeps = ./deps.json; # nix build .#k8s-bridge.passthru.fetch-deps
+  dotnetInstallFlags = "-f net8.0";
 
   meta = with lib; {
     homepage = "https://github.com/WiiPlayer2/K8sBridge";

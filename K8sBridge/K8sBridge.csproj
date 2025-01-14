@@ -3,8 +3,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>true</IsPackable>
-	<PackAsTool>true</PackAsTool>
-	<ToolCommandName>k8s-bridge</ToolCommandName>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>k8s-bridge</ToolCommandName>
+    <AssemblyName>k8s-bridge</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
