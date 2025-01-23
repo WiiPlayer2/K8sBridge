@@ -44,7 +44,7 @@ internal class KubernetesApi : IKubernetesApi
             .Where(x => x.Item2.Metadata.Name == createdPod.Name())
             .FirstAsync(x => (x.Item2.Status.Conditions
                               ?? Enumerable.Empty<V1PodCondition>())
-                    .Any(x => x is {Type: "Ready", Status: "True"}),
+                    .Any(x => x is { Type: "Ready", Status: "True" }),
                 cancellationToken);
     }
 
@@ -53,9 +53,11 @@ internal class KubernetesApi : IKubernetesApi
         await k8s.CoreV1.DeleteNamespacedPodAsync(pod.Name, pod.Namespace, cancellationToken: cancellationToken);
     }
 
-    public async ValueTask<Option<KubernetesService>> FindServiceAsync(string @namespace, string name, CancellationToken cancellationToken = default)
+    public async ValueTask<Option<KubernetesService>> FindServiceAsync(string @namespace, string name,
+        CancellationToken cancellationToken = default)
     {
-        var k8sService = await k8s.CoreV1.ReadNamespacedServiceAsync(name, @namespace, cancellationToken: cancellationToken);
+        var k8sService =
+            await k8s.CoreV1.ReadNamespacedServiceAsync(name, @namespace, cancellationToken: cancellationToken);
         if (k8sService is null)
         {
             return None;
@@ -70,7 +72,8 @@ internal class KubernetesApi : IKubernetesApi
             k8sService.Spec.Selector.ToMap());
     }
 
-    public async ValueTask PortforwardAsync(string @namespace, string name, int port, int localPort, CancellationToken cancellationToken = default)
+    public async ValueTask PortforwardAsync(string @namespace, string name, int port, int localPort,
+        CancellationToken cancellationToken = default)
     {
         await Cli.Wrap("kubectl")
             .WithArguments(b => b
@@ -82,5 +85,17 @@ internal class KubernetesApi : IKubernetesApi
             .WithStandardOutputPipe(PipeTarget.ToStream(Console.OpenStandardOutput()))
             .WithStandardErrorPipe(PipeTarget.ToStream(Console.OpenStandardError()))
             .ExecuteAsync(cancellationToken);
+    }
+
+    public async ValueTask UpdateServiceSelector(string @namespace, string name, Map<string, string> selector,
+        CancellationToken cancellationToken = default)
+    {
+        var k8sService =
+            await k8s.CoreV1.ReadNamespacedServiceAsync(name, @namespace, cancellationToken: cancellationToken);
+        if (k8sService is null) throw new InvalidOperationException($"Service \"{@namespace}/{name}\" not found");
+
+        k8sService.Spec.Selector = selector.AsEnumerable().ToDictionary();
+        await k8s.CoreV1.ReplaceNamespacedServiceAsync(k8sService, name, @namespace,
+            cancellationToken: cancellationToken);
     }
 }
