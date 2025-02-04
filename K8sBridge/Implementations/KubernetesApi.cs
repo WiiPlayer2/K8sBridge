@@ -1,8 +1,10 @@
-﻿using CliWrap;
+﻿using System.Globalization;
+using CliWrap;
 using k8s;
 using k8s.Models;
 using K8sBridge.Application;
 using K8sBridge.Application.Abstractions;
+using K8sBridge.Domain;
 
 namespace K8sBridge.Implementations;
 
@@ -67,9 +69,16 @@ internal class KubernetesApi : IKubernetesApi
             k8sService.Namespace(),
             k8sService.Name(),
             k8sService.Spec.Ports
-                .Select(x => (x.Name, int.Parse(x.TargetPort)))
+                .Select(x => (x.Name, ParseTargetPort(x.TargetPort)))
                 .ToMap(),
             k8sService.Spec.Selector.ToMap());
+
+        TargetPort ParseTargetPort(IntstrIntOrString value)
+        {
+            return int.TryParse(value, CultureInfo.InvariantCulture, out var portNumber)
+                ? TargetPort.Number(portNumber)
+                : TargetPort.Name(value);
+        }
     }
 
     public async ValueTask PortforwardAsync(string @namespace, string name, int port, int localPort,

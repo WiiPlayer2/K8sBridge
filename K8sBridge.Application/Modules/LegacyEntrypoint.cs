@@ -1,4 +1,5 @@
 ﻿using K8sBridge.Application.Traits;
+using K8sBridge.Domain;
 using LanguageExt.UnitsOfMeasure;
 
 namespace K8sBridge.Application.Modules;
@@ -16,10 +17,11 @@ public class LegacyEntrypoint<RT>
         from _05 in Aff((RT rt) =>
             k8sApi.UpdateServiceSelector(args.Namespace, args.Service, bridgeSelector, rt.CancellationToken).ToUnit())
         let bridgePort = 7000
+        let podPorts = DeterminePodPorts(k8sService.TargetPorts)
         let bridgePod = new KubernetesBridgePod(
             args.Namespace,
             $"tunneling-{args.Service}",
-            k8sService.TargetPorts,
+            podPorts,
             bridgePort,
             bridgeSelector)
         let tunnelingPort = random(1000) + 7000
@@ -44,4 +46,31 @@ public class LegacyEntrypoint<RT>
 
     private static Aff<RT, Unit> WaitForTermination() =>
         Aff((RT rt) => Task.Delay(Timeout.Infinite, rt.CancellationToken).ToUnit().ToValue());
+
+    private static Map<string, int> DeterminePodPorts(Map<string, TargetPort> targetPorts)
+    {
+        var predeterminedPorts = targetPorts.Tuples
+            .Select(x => x.Item2.Match(
+                name => -1,
+                number => number.Value))
+            .Where(x => x != -1)
+            .ToHashSet();
+        var nextPort = 2000;
+        var podPorts = targetPorts
+            .Tuples
+            .Map(port => port.Item2.Match(
+                name =>
+                {
+                    var portNumber = nextPort;
+                    while (predeterminedPorts.Contains(portNumber))
+                        portNumber++;
+                    nextPort = portNumber + 1;
+                    return
+                        (name.Value,
+                            portNumber); // this assumes that the target port has the same name as the port name of the service
+                },
+                number => (port.Item1, number.Value)))
+            .ToMap();
+        return podPorts;
+    }
 }
